@@ -24,6 +24,8 @@
 #include "Mouse.h"
 #include "Graphics.h"
 #include "Minefield.h"
+#include <random>
+#include <assert.h>
 
 class Game
 {
@@ -43,6 +45,8 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
+	std::random_device rd;
+	std::mt19937 rng;
 	Minefield field;
 	/********************************/
 };
