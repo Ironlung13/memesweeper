@@ -63,6 +63,44 @@ Minefield::Tile& Minefield::TileAt(const Vei2& fieldpos)
 	return tiles[fieldpos.x + fieldpos.y * width];
 }
 
+Vei2 Minefield::ScreenToField(const Vei2 screenpos)
+{
+	return Vei2{ screenpos.x / SpriteCodex::tileSize,screenpos.y / SpriteCodex::tileSize };
+}
+
+
+void Minefield::OnMouseClick(Mouse& mouse)
+{
+	Vei2 fieldpos;
+	switch (mouse.Read().GetType())
+	{
+	case Mouse::Event::Type::LPress:
+		fieldpos = ScreenToField(mouse.GetPos());
+		if (fieldpos.x <= width && fieldpos.y <= height)
+		{
+			if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
+			{
+				TileAt(fieldpos).Reveal();
+			}
+		}
+		break;
+
+	case Mouse::Event::Type::RPress:
+		fieldpos = ScreenToField(mouse.GetPos());
+		if (fieldpos.x <= width && fieldpos.y <= height)
+		{
+			if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
+			{
+				TileAt(fieldpos).Flag();
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
+	
+}
 
 bool Minefield::Tile::HasMine() const
 {
@@ -72,6 +110,25 @@ bool Minefield::Tile::HasMine() const
 void Minefield::Tile::SpawnMine()
 {
 	hasMine = true;
+}
+
+void Minefield::Tile::Reveal()
+{
+	assert(state == State::Hidden);
+	if (!hasMine)
+	{
+		state = State::Revealed;
+	}
+	else
+	{
+		state = State::Mine;
+	}
+}
+
+void Minefield::Tile::Flag()
+{
+	assert(state == State::Hidden);
+	state = State::Flagged;
 }
 
 const Minefield::Tile::State& Minefield::Tile::GetState() const

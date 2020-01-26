@@ -25,9 +25,9 @@ Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	field()
+	rng(rd()),
+	field(rng)
 {
-	std::mt19937 rng(rd());
 }
 
 void Game::Go()
@@ -40,6 +40,7 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	//field.OnMouseClick(wnd.mouse);
 }
 
 void Game::ComposeFrame()

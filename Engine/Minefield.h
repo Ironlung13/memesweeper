@@ -13,6 +13,9 @@ class Minefield
 public:
 	Minefield(std::mt19937& rng);
 	void Draw(Graphics& gfx);
+	void OnMouseClick(Mouse& mouse);		//Reveal, flag, unflag etc.
+
+
 private:
 	class Tile
 	{
@@ -25,9 +28,10 @@ private:
 			Mine
 		};
 	public:
-		void OnMouseClick(Mouse& mouse);		//Reveal, flag, unflag etc.
 		bool HasMine() const;
 		void SpawnMine();
+		void Reveal();
+		void Flag();
 		const State& GetState() const;
 	private:
 		State state = State::Hidden;
@@ -37,6 +41,7 @@ private:
 private:
 	const Tile& TileAt(const Vei2& fieldpos) const;
 	Tile& TileAt(const Vei2& fieldpos);
+	Vei2 ScreenToField(const Vei2 screenpos);
 	static constexpr int height = 16;
 	static constexpr int width = 20;
 	static constexpr int nMines = 10;
