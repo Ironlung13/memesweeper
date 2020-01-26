@@ -46,7 +46,6 @@ private:
 	/********************************/
 	/*  User Variables              */
 	std::random_device rd;
-	std::mt19937 rng;
 	Minefield field;
 	/********************************/
 };

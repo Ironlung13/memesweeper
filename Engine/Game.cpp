@@ -27,6 +27,7 @@ Game::Game(MainWindow& wnd)
 	gfx(wnd),
 	field()
 {
+	std::mt19937 rng(rd());
 }
 
 void Game::Go()
