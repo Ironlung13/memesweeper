@@ -14,6 +14,11 @@ Minefield::Minefield(std::mt19937& rng)
 
 		TileAt(fieldpos).SpawnMine();
 	}
+
+	for (Tile b : tiles)
+	{
+		b.Init();
+	}
 }
 
 void Minefield::Draw(Graphics& gfx)
@@ -26,7 +31,7 @@ void Minefield::Draw(Graphics& gfx)
 	{
 		for (fieldpos.y = 0; fieldpos.y < height * SpriteCodex::tileSize; fieldpos.y += SpriteCodex::tileSize)
 		{
-			switch (TileAt(fieldpos).GetState())
+			switch (TileAt(fieldpos/ SpriteCodex::tileSize).GetState())
 			{
 			case Minefield::Tile::State::Hidden:
 				SpriteCodex::DrawTileButton(fieldpos, gfx);
@@ -100,6 +105,35 @@ void Minefield::OnMouseClick(Mouse& mouse)
 	}
 
 	
+}
+
+void Minefield::OnLMClick(Mouse& mouse)
+{
+	Vei2 fieldpos = ScreenToField(mouse.GetPos());
+	if (fieldpos.x <= width && fieldpos.y <= height)
+	{
+		if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
+		{
+			TileAt(fieldpos).Reveal();
+		}
+	}
+}
+
+void Minefield::OnRMClick(Mouse & mouse)
+{
+	Vei2 fieldpos = ScreenToField(mouse.GetPos());
+	if (fieldpos.x <= width && fieldpos.y <= height)
+	{
+		if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
+		{
+			TileAt(fieldpos).Flag();
+		}
+	}
+}
+
+void Minefield::Tile::Init()
+{
+	state = State::Hidden;
 }
 
 bool Minefield::Tile::HasMine() const

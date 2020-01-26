@@ -40,7 +40,7 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	//field.OnMouseClick(wnd.mouse);
+	field.OnMouseClick(wnd.mouse);
 }
 
 void Game::ComposeFrame()
