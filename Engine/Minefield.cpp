@@ -94,7 +94,7 @@ void Minefield::OnMouseClick(Mouse& mouse)
 		fieldpos = ScreenToField(mouse.GetPos());
 		if (fieldpos.x <= width && fieldpos.y <= height)
 		{
-			if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
+			if (TileAt(fieldpos).GetState() != Tile::State::Revealed)
 			{
 				TileAt(fieldpos).Flag();
 			}
@@ -103,33 +103,8 @@ void Minefield::OnMouseClick(Mouse& mouse)
 	default:
 		break;
 	}
-
-	
 }
 
-void Minefield::OnLMClick(Mouse& mouse)
-{
-	Vei2 fieldpos = ScreenToField(mouse.GetPos());
-	if (fieldpos.x <= width && fieldpos.y <= height)
-	{
-		if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
-		{
-			TileAt(fieldpos).Reveal();
-		}
-	}
-}
-
-void Minefield::OnRMClick(Mouse & mouse)
-{
-	Vei2 fieldpos = ScreenToField(mouse.GetPos());
-	if (fieldpos.x <= width && fieldpos.y <= height)
-	{
-		if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
-		{
-			TileAt(fieldpos).Flag();
-		}
-	}
-}
 
 void Minefield::Tile::Init()
 {
@@ -161,8 +136,12 @@ void Minefield::Tile::Reveal()
 
 void Minefield::Tile::Flag()
 {
-	assert(state == State::Hidden);
-	state = State::Flagged;
+	assert(state == State::Hidden || state == State::Flagged);
+	if (state == State::Hidden)
+	{
+		state = State::Flagged;
+	}
+	else state = State::Hidden;
 }
 
 const Minefield::Tile::State& Minefield::Tile::GetState() const

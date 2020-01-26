@@ -14,8 +14,6 @@ public:
 	Minefield(std::mt19937& rng);
 	void Draw(Graphics& gfx);
 	void OnMouseClick(Mouse& mouse);		//Reveal, flag, unflag etc.
-	void OnLMClick(Mouse& mouse);
-	void OnRMClick(Mouse& mouse);
 
 
 private:
