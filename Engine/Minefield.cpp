@@ -26,32 +26,64 @@ void Minefield::Draw(Graphics& gfx)
 	gfx.DrawRect(0, 0, width * SpriteCodex::tileSize, height*SpriteCodex::tileSize, { 192,192,192 });	//Draws background for tiles
 
 
-	Vei2 fieldpos{ 0,0 };
-	for (fieldpos.x = 0; fieldpos.x < width * SpriteCodex::tileSize; fieldpos.x += SpriteCodex::tileSize)
+	Vei2 screenpos{ 0,0 };
+	for (screenpos.x = 0; screenpos.x < width * SpriteCodex::tileSize; screenpos.x += SpriteCodex::tileSize)
 	{
-		for (fieldpos.y = 0; fieldpos.y < height * SpriteCodex::tileSize; fieldpos.y += SpriteCodex::tileSize)
+		for (screenpos.y = 0; screenpos.y < height * SpriteCodex::tileSize; screenpos.y += SpriteCodex::tileSize)
 		{
-			switch (TileAt(fieldpos/ SpriteCodex::tileSize).GetState())
+			switch (TileAt(screenpos/ SpriteCodex::tileSize).GetState())
 			{
 			case Minefield::Tile::State::Hidden:
-				SpriteCodex::DrawTileButton(fieldpos, gfx);
+				SpriteCodex::DrawTileButton(screenpos, gfx);
 				break;
 
 			case Minefield::Tile::State::Revealed:
-				SpriteCodex::DrawTile0(fieldpos, gfx);
+				switch (CountMines(ScreenToField(screenpos)))
+				{
+				case 0:
+					SpriteCodex::DrawTile0(screenpos, gfx);
+					break;
+				case 1:
+					SpriteCodex::DrawTile1(screenpos, gfx);
+					break;
+				case 2:
+					SpriteCodex::DrawTile2(screenpos, gfx);
+					break;
+				case 3:
+					SpriteCodex::DrawTile3(screenpos, gfx);
+					break;
+				case 4:
+					SpriteCodex::DrawTile4(screenpos, gfx);
+					break;
+				case 5:
+					SpriteCodex::DrawTile5(screenpos, gfx);
+					break;
+				case 6:
+					SpriteCodex::DrawTile6(screenpos, gfx);
+					break;
+				case 7:
+					SpriteCodex::DrawTile7(screenpos, gfx);
+					break;
+				case 8:
+					SpriteCodex::DrawTile8(screenpos, gfx);
+					break;
+				default:
+					SpriteCodex::DrawTile0(screenpos, gfx);
+					break;
+				}
 				break;
 
 			case Minefield::Tile::State::Flagged:
-				SpriteCodex::DrawTileButton(fieldpos, gfx);
-				SpriteCodex::DrawTileFlag(fieldpos, gfx);
+				SpriteCodex::DrawTileButton(screenpos, gfx);
+				SpriteCodex::DrawTileFlag(screenpos, gfx);
 				break;
 
 			case Minefield::Tile::State::Mine:
-				SpriteCodex::DrawTileBomb(fieldpos, gfx);
+				SpriteCodex::DrawTileBomb(screenpos, gfx);
 				break;
 
 			default:
-				SpriteCodex::DrawTile0(fieldpos, gfx);
+				SpriteCodex::DrawTile0(screenpos, gfx);
 				break;
 			}
 		}
@@ -71,6 +103,21 @@ Minefield::Tile& Minefield::TileAt(const Vei2& fieldpos)
 Vei2 Minefield::ScreenToField(const Vei2 screenpos)
 {
 	return Vei2{ screenpos.x / SpriteCodex::tileSize,screenpos.y / SpriteCodex::tileSize };
+}
+
+int Minefield::CountMines(const Vei2& fieldpos)
+{
+	int Mines = 0;
+	for (int x = fieldpos.x - 1; x <= fieldpos.x + 1; x++)
+		for (int y = fieldpos.y - 1; y <= fieldpos.y + 1; y++)
+		{
+			if (x >= 0 && x <= width && y >= 0 && y <= height)
+			{
+				if (TileAt({ x,y }).HasMine())
+					Mines++;
+			}
+		}
+	return Mines;
 }
 
 
