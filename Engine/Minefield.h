@@ -50,6 +50,8 @@ private:
 	static constexpr int height = 16;
 	static constexpr int width = 20;
 	static constexpr int nMines = 10;
+	static constexpr int screen_left = (Graphics::ScreenWidth / 2) - SpriteCodex::tileSize * width / 2;
+	static constexpr int screen_top = (Graphics::ScreenHeight / 2) - SpriteCodex::tileSize * height / 2;
 	Tile tiles[height*width];
 	bool gameover = false;
 

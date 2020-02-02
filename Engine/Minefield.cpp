@@ -29,15 +29,14 @@ Minefield::Minefield(std::mt19937& rng)
 
 void Minefield::Draw(Graphics& gfx)
 {
-	gfx.DrawRect(0, 0, width * SpriteCodex::tileSize, height*SpriteCodex::tileSize, { 192,192,192 });	//Draws background for tiles
+	gfx.DrawRect(screen_left, screen_top, screen_left + width * SpriteCodex::tileSize, screen_top + height*SpriteCodex::tileSize, { 192,192,192 });	//Draws background for tiles
 
-
-	Vei2 screenpos{ 0,0 };
-	for (screenpos.x = 0; screenpos.x < width * SpriteCodex::tileSize; screenpos.x += SpriteCodex::tileSize)
+	Vei2 screenpos{ screen_left,screen_top };
+	for (screenpos.x = screen_left; screenpos.x < screen_left + width * SpriteCodex::tileSize; screenpos.x += SpriteCodex::tileSize)
 	{
-		for (screenpos.y = 0; screenpos.y < height * SpriteCodex::tileSize; screenpos.y += SpriteCodex::tileSize)
+		for (screenpos.y = screen_top; screenpos.y < screen_top + height * SpriteCodex::tileSize; screenpos.y += SpriteCodex::tileSize)
 		{
-			switch (TileAt(screenpos/ SpriteCodex::tileSize).GetState())
+			switch (TileAt(ScreenToField(screenpos)).GetState())
 			{
 			case Minefield::Tile::State::Hidden:
 				if (!gameover)
@@ -125,7 +124,7 @@ Minefield::Tile& Minefield::TileAt(const Vei2& fieldpos)
 
 Vei2 Minefield::ScreenToField(const Vei2 screenpos)
 {
-	return Vei2{ screenpos.x / SpriteCodex::tileSize,screenpos.y / SpriteCodex::tileSize };
+	return Vei2{ (screenpos.x - screen_left) / SpriteCodex::tileSize,(screenpos.y - screen_top) / SpriteCodex::tileSize };
 }
 
 int Minefield::CountMines(const Vei2& fieldpos)
