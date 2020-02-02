@@ -15,6 +15,12 @@ Minefield::Minefield(std::mt19937& rng)
 		TileAt(fieldpos).SpawnMine();
 	}
 
+	for (fieldpos.x = 0; fieldpos.x <= width; fieldpos.x++)
+		for (fieldpos.y = 0; fieldpos.y <= height; fieldpos.y++)
+		{
+			TileAt(fieldpos).SetNeighborMines(CountMines(fieldpos));
+		}
+
 	for (Tile b : tiles)
 	{
 		b.Init();
@@ -38,7 +44,7 @@ void Minefield::Draw(Graphics& gfx)
 				break;
 
 			case Minefield::Tile::State::Revealed:
-				switch (CountMines(ScreenToField(screenpos)))
+				switch (TileAt(ScreenToField(screenpos)).GetNeighborMines())
 				{
 				case 0:
 					SpriteCodex::DrawTile0(screenpos, gfx);
@@ -194,4 +200,14 @@ void Minefield::Tile::Flag()
 const Minefield::Tile::State& Minefield::Tile::GetState() const
 {
 	return state;
+}
+
+void Minefield::Tile::SetNeighborMines(int MineCount)
+{
+	neighborMines = MineCount;
+}
+
+int Minefield::Tile::GetNeighborMines() const
+{
+	return neighborMines;
 }

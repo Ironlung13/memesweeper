@@ -33,9 +33,12 @@ private:
 		void Reveal();
 		void Flag();
 		const State& GetState() const;
+		void SetNeighborMines(int MineCount);
+		int GetNeighborMines() const;
 	private:
 		State state = State::Hidden;
 		bool hasMine = false;
+		int neighborMines = -1;
 	};
 
 private:
