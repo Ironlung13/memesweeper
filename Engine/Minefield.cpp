@@ -40,52 +40,69 @@ void Minefield::Draw(Graphics& gfx)
 			switch (TileAt(screenpos/ SpriteCodex::tileSize).GetState())
 			{
 			case Minefield::Tile::State::Hidden:
-				SpriteCodex::DrawTileButton(screenpos, gfx);
-				break;
+				if (!gameover)
+				{
+					SpriteCodex::DrawTileButton(screenpos, gfx);
+					break;
+				}
+				else 
+				{
+					if (TileAt(ScreenToField(screenpos)).HasMine())
+					{
+						SpriteCodex::DrawTileBomb(screenpos, gfx);
+						break;
+					}
+					else
+					{
+						SpriteCodex::DrawTileButton(screenpos, gfx);
+						break;
+					}
+				}
 
 			case Minefield::Tile::State::Revealed:
-				switch (TileAt(ScreenToField(screenpos)).GetNeighborMines())
+				if (!gameover)
 				{
-				case 0:
-					SpriteCodex::DrawTile0(screenpos, gfx);
+					SpriteCodex::DrawTileNumber(screenpos, TileAt(ScreenToField(screenpos)).GetNeighborMines(), gfx);
 					break;
-				case 1:
-					SpriteCodex::DrawTile1(screenpos, gfx);
-					break;
-				case 2:
-					SpriteCodex::DrawTile2(screenpos, gfx);
-					break;
-				case 3:
-					SpriteCodex::DrawTile3(screenpos, gfx);
-					break;
-				case 4:
-					SpriteCodex::DrawTile4(screenpos, gfx);
-					break;
-				case 5:
-					SpriteCodex::DrawTile5(screenpos, gfx);
-					break;
-				case 6:
-					SpriteCodex::DrawTile6(screenpos, gfx);
-					break;
-				case 7:
-					SpriteCodex::DrawTile7(screenpos, gfx);
-					break;
-				case 8:
-					SpriteCodex::DrawTile8(screenpos, gfx);
-					break;
-				default:
-					SpriteCodex::DrawTile0(screenpos, gfx);
-					break;
+				}
+				else
+				{
+					if (TileAt(ScreenToField(screenpos)).HasMine())
+					{
+						SpriteCodex::DrawTileBomb(screenpos, gfx);
+						break;
+					}
+					else
+					{
+						SpriteCodex::DrawTileNumber(screenpos, TileAt(ScreenToField(screenpos)).GetNeighborMines(), gfx);
+						break;
+					}
+				}
+
+			case Minefield::Tile::State::Flagged:
+				if (!gameover)
+				{
+					SpriteCodex::DrawTileButton(screenpos, gfx);
+					SpriteCodex::DrawTileFlag(screenpos, gfx);
+				}
+				else
+				{
+					if (TileAt(ScreenToField(screenpos)).HasMine())
+					{
+						SpriteCodex::DrawTileBomb(screenpos, gfx);
+						SpriteCodex::DrawTileFlag(screenpos, gfx);
+					}
+					else
+					{
+						SpriteCodex::DrawTileButton(screenpos, gfx);
+						SpriteCodex::DrawTileFlag(screenpos, gfx);
+						SpriteCodex::DrawTileCross(screenpos, gfx);
+					}
 				}
 				break;
 
-			case Minefield::Tile::State::Flagged:
-				SpriteCodex::DrawTileButton(screenpos, gfx);
-				SpriteCodex::DrawTileFlag(screenpos, gfx);
-				break;
-
 			case Minefield::Tile::State::Mine:
-				SpriteCodex::DrawTileBomb(screenpos, gfx);
+				SpriteCodex::DrawTileBombRed(screenpos, gfx);
 				break;
 
 			default:
@@ -129,32 +146,39 @@ int Minefield::CountMines(const Vei2& fieldpos)
 
 void Minefield::OnMouseClick(Mouse& mouse)
 {
-	Vei2 fieldpos;
-	switch (mouse.Read().GetType())
+	if (!gameover)
 	{
-	case Mouse::Event::Type::LPress:
-		fieldpos = ScreenToField(mouse.GetPos());
-		if (fieldpos.x <= width && fieldpos.y <= height)
+		Vei2 fieldpos;
+		switch (mouse.Read().GetType())
 		{
-			if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
+		case Mouse::Event::Type::LPress:
+			fieldpos = ScreenToField(mouse.GetPos());
+			if (fieldpos.x <= width && fieldpos.y <= height)
 			{
-				TileAt(fieldpos).Reveal();
+				if (TileAt(fieldpos).GetState() == Tile::State::Hidden)
+				{
+					TileAt(fieldpos).Reveal();
+					if (TileAt(fieldpos).HasMine())
+					{
+						gameover = true;
+					}
+				}
 			}
-		}
-		break;
+			break;
 
-	case Mouse::Event::Type::RPress:
-		fieldpos = ScreenToField(mouse.GetPos());
-		if (fieldpos.x <= width && fieldpos.y <= height)
-		{
-			if (TileAt(fieldpos).GetState() != Tile::State::Revealed)
+		case Mouse::Event::Type::RPress:
+			fieldpos = ScreenToField(mouse.GetPos());
+			if (fieldpos.x <= width && fieldpos.y <= height)
 			{
-				TileAt(fieldpos).Flag();
+				if (TileAt(fieldpos).GetState() != Tile::State::Revealed)
+				{
+					TileAt(fieldpos).Flag();
+				}
 			}
+			break;
+		default:
+			break;
 		}
-		break;
-	default:
-		break;
 	}
 }
 

@@ -46,10 +46,12 @@ private:
 	Tile& TileAt(const Vei2& fieldpos);
 	Vei2 ScreenToField(const Vei2 screenpos);
 	int CountMines(const Vei2& fieldpos);
+
 	static constexpr int height = 16;
 	static constexpr int width = 20;
 	static constexpr int nMines = 10;
 	Tile tiles[height*width];
+	bool gameover = false;
 
 };
 
