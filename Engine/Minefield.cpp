@@ -1,4 +1,5 @@
 #include "Minefield.h"
+#include <algorithm>
 
 Minefield::Minefield(std::mt19937& rng)
 {
@@ -15,16 +16,15 @@ Minefield::Minefield(std::mt19937& rng)
 		TileAt(fieldpos).SpawnMine();
 	}
 
-	for (fieldpos.x = 0; fieldpos.x <= width; fieldpos.x++)
-		for (fieldpos.y = 0; fieldpos.y <= height; fieldpos.y++)
+	for (fieldpos.x = 0; fieldpos.x < width; fieldpos.x++)
+		for (fieldpos.y = 0; fieldpos.y < height; fieldpos.y++)
 		{
-			TileAt(fieldpos).SetNeighborMines(CountMines(fieldpos));
+			if (!TileAt(fieldpos).HasMine())
+			{
+				TileAt(fieldpos).SetNeighborMines(CountMines(fieldpos));
+			}
 		}
 
-	for (Tile b : tiles)
-	{
-		b.Init();
-	}
 }
 
 void Minefield::Draw(Graphics& gfx)
@@ -61,8 +61,16 @@ void Minefield::Draw(Graphics& gfx)
 			case Minefield::Tile::State::Revealed:
 				if (!gameover)
 				{
-					SpriteCodex::DrawTileNumber(screenpos, TileAt(ScreenToField(screenpos)).GetNeighborMines(), gfx);
-					break;
+					if (!TileAt(ScreenToField(screenpos)).HasMine())
+					{
+						SpriteCodex::DrawTileNumber(screenpos, TileAt(ScreenToField(screenpos)).GetNeighborMines(), gfx);
+						break;
+					}
+					else
+					{
+						SpriteCodex::DrawTileBombRed(screenpos, gfx);
+						break;
+					}
 				}
 				else
 				{
@@ -129,15 +137,18 @@ Vei2 Minefield::ScreenToField(const Vei2 screenpos)
 
 int Minefield::CountMines(const Vei2& fieldpos)
 {
+	const int low_x = std::max(0, fieldpos.x - 1);
+	const int high_x = std::min(width - 1, fieldpos.x + 1);
+	const int low_y = std::max(0, fieldpos.y - 1);
+	const int high_y = std::min(height - 1, fieldpos.y + 1);
+
+
 	int Mines = 0;
-	for (int x = fieldpos.x - 1; x <= fieldpos.x + 1; x++)
-		for (int y = fieldpos.y - 1; y <= fieldpos.y + 1; y++)
+	for (int x = low_x; x <= high_x; ++x)
+		for (int y = low_y; y <= high_y; ++y)
 		{
-			if (x >= 0 && x <= width && y >= 0 && y <= height)
-			{
-				if (TileAt({ x,y }).HasMine())
-					Mines++;
-			}
+			if (TileAt({ x,y }).HasMine())
+				Mines++;
 		}
 	return Mines;
 }
@@ -199,7 +210,7 @@ void Minefield::Tile::SpawnMine()
 
 void Minefield::Tile::Reveal()
 {
-	assert(state == State::Hidden);
+	/*assert(state == State::Hidden);
 	if (!hasMine)
 	{
 		state = State::Revealed;
@@ -207,7 +218,8 @@ void Minefield::Tile::Reveal()
 	else
 	{
 		state = State::Mine;
-	}
+	}*/
+	state = State::Revealed;
 }
 
 void Minefield::Tile::Flag()

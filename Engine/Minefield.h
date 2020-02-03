@@ -36,7 +36,7 @@ private:
 		void SetNeighborMines(int MineCount);
 		int GetNeighborMines() const;
 	private:
-		State state = State::Hidden;
+		State state = State::Revealed;
 		bool hasMine = false;
 		int neighborMines = -1;
 	};
@@ -47,9 +47,9 @@ private:
 	Vei2 ScreenToField(const Vei2 screenpos);
 	int CountMines(const Vei2& fieldpos);
 
-	static constexpr int height = 16;
-	static constexpr int width = 20;
-	static constexpr int nMines = 10;
+	static constexpr int height = 7;
+	static constexpr int width = 5;
+	static constexpr int nMines = height * width / 6;
 	static constexpr int screen_left = (Graphics::ScreenWidth / 2) - SpriteCodex::tileSize * width / 2;
 	static constexpr int screen_top = (Graphics::ScreenHeight / 2) - SpriteCodex::tileSize * height / 2;
 	Tile tiles[height*width];
