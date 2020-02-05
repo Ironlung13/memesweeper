@@ -66,11 +66,6 @@ void Minefield::Draw(Graphics& gfx)
 						SpriteCodex::DrawTileNumber(screenpos, TileAt(ScreenToField(screenpos)).GetNeighborMines(), gfx);
 						break;
 					}
-					else
-					{
-						SpriteCodex::DrawTileBombRed(screenpos, gfx);
-						break;
-					}
 				}
 				else
 				{
@@ -153,6 +148,26 @@ int Minefield::CountMines(const Vei2& fieldpos)
 	return Mines;
 }
 
+void Minefield::RevealNearbyTiles(const Vei2& fieldpos)
+{
+	const int low_x = std::max(0, fieldpos.x - 1);
+	const int high_x = std::min(width - 1, fieldpos.x + 1);
+	const int low_y = std::max(0, fieldpos.y - 1);
+	const int high_y = std::min(height - 1, fieldpos.y + 1);
+	
+	Vei2 pos;
+	for (pos.x = low_x; pos.x <= high_x; pos.x++)
+		for (pos.y = low_y; pos.y <= high_y; pos.y++)
+		{
+			if (TileAt(pos).GetNeighborMines() == 0 && TileAt(pos).GetState() == Tile::State::Hidden)
+			{
+				TileAt(pos).Reveal();
+				RevealNearbyTiles(pos);
+			}
+			else TileAt(pos).Reveal();
+		}
+}
+
 
 void Minefield::OnMouseClick(Mouse& mouse)
 {
@@ -171,6 +186,10 @@ void Minefield::OnMouseClick(Mouse& mouse)
 					if (TileAt(fieldpos).HasMine())
 					{
 						gameover = true;
+					}
+					if (TileAt(fieldpos).GetNeighborMines() == 0)
+					{
+						RevealNearbyTiles(fieldpos);
 					}
 				}
 			}
@@ -210,15 +229,6 @@ void Minefield::Tile::SpawnMine()
 
 void Minefield::Tile::Reveal()
 {
-	/*assert(state == State::Hidden);
-	if (!hasMine)
-	{
-		state = State::Revealed;
-	}
-	else
-	{
-		state = State::Mine;
-	}*/
 	state = State::Revealed;
 }
 
