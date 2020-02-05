@@ -39,7 +39,7 @@ void Minefield::Draw(Graphics& gfx)
 			switch (TileAt(ScreenToField(screenpos)).GetState())
 			{
 			case Minefield::Tile::State::Hidden:
-				if (!gameover)
+				if (!(state == State::Game_Over))
 				{
 					SpriteCodex::DrawTileButton(screenpos, gfx);
 					break;
@@ -59,7 +59,7 @@ void Minefield::Draw(Graphics& gfx)
 				}
 
 			case Minefield::Tile::State::Revealed:
-				if (!gameover)
+				if (!(state == State::Game_Over))
 				{
 					if (!TileAt(ScreenToField(screenpos)).HasMine())
 					{
@@ -82,12 +82,12 @@ void Minefield::Draw(Graphics& gfx)
 				}
 
 			case Minefield::Tile::State::Flagged:
-				if (!gameover)
+				if (state == State::Game_On)
 				{
 					SpriteCodex::DrawTileButton(screenpos, gfx);
 					SpriteCodex::DrawTileFlag(screenpos, gfx);
 				}
-				else
+				else 
 				{
 					if (TileAt(ScreenToField(screenpos)).HasMine())
 					{
@@ -168,10 +168,18 @@ void Minefield::RevealNearbyTiles(const Vei2& fieldpos)
 		}
 }
 
+void Minefield::CheckForWin()
+{
+	if (CorrectFlags == nMines)
+	{
+		state = State::Win;
+	}
+}
+
 
 void Minefield::OnMouseClick(Mouse& mouse)
 {
-	if (!gameover)
+	if (!(state == State::Game_Over))
 	{
 		Vei2 fieldpos;
 		switch (mouse.Read().GetType())
@@ -185,7 +193,7 @@ void Minefield::OnMouseClick(Mouse& mouse)
 					TileAt(fieldpos).Reveal();
 					if (TileAt(fieldpos).HasMine())
 					{
-						gameover = true;
+						state = State::Game_Over;
 					}
 					if (TileAt(fieldpos).GetNeighborMines() == 0)
 					{
@@ -202,8 +210,25 @@ void Minefield::OnMouseClick(Mouse& mouse)
 				if (TileAt(fieldpos).GetState() != Tile::State::Revealed)
 				{
 					TileAt(fieldpos).Flag();
+					if (TileAt(fieldpos).HasMine())
+					{
+						switch (TileAt(fieldpos).GetState())
+						{
+						case Tile::State::Flagged:
+							CorrectFlags++;
+							break;
+
+						case Tile::State::Hidden:
+							CorrectFlags--;
+							break;
+
+						default:
+							break;
+						}
+					}
 				}
 			}
+			CheckForWin();
 			break;
 		default:
 			break;

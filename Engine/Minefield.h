@@ -11,6 +11,13 @@
 class Minefield
 {
 public:
+	enum class State
+	{
+		Game_On,
+		Game_Over,
+		Win
+	};
+
 	Minefield(std::mt19937& rng);
 	void Draw(Graphics& gfx);
 	void OnMouseClick(Mouse& mouse);		//Reveal, flag, unflag etc.
@@ -47,6 +54,8 @@ private:
 	Vei2 ScreenToField(const Vei2 screenpos);
 	int CountMines(const Vei2& fieldpos);
 	void RevealNearbyTiles(const Vei2& fieldpos);
+	void CheckForWin();
+	int CorrectFlags = 0;
 
 	static constexpr int height = 16;
 	static constexpr int width = 20;
@@ -54,7 +63,8 @@ private:
 	static constexpr int screen_left = (Graphics::ScreenWidth / 2) - SpriteCodex::tileSize * width / 2;
 	static constexpr int screen_top = (Graphics::ScreenHeight / 2) - SpriteCodex::tileSize * height / 2;
 	Tile tiles[height*width];
-	bool gameover = false;
+	State state = State::Game_On;
+	
 
 };
 
